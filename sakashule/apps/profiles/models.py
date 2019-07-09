@@ -8,7 +8,7 @@ from cloudinary.models import CloudinaryField
 class Profile(TimestampsMixin):
     user = models.OneToOneField(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile")
     county = models.TextField(default="What county are you situated in?")
-    level = models.TextField(default="Kindly indicate what level the school is (Primary, Highschool or University).")
+    level = models.TextField(default="Update level (e.g primary, secondary).")
     ownership = models.TextField(default="Kindly update if Private or Public")
     bio = models.TextField(default="Update your bio")
     image = CloudinaryField("image")

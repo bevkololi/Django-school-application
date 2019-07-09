@@ -1,7 +1,7 @@
 from django.utils.text import slugify
 from rest_framework import serializers
 
-from sakashule.apps.schools.models import School, Comment
+from sakashule.apps.schools.models import School, Comment, Event, Update, Uniform, User
 from sakashule.apps.profiles.models import Profile
 from sakashule.apps.profiles.serializers import ProfileSerializer
 
@@ -9,34 +9,10 @@ from sakashule.apps.profiles.serializers import ProfileSerializer
 class SchoolSerializer(serializers.ModelSerializer):
     slug = serializers.CharField(read_only=True, max_length=255)
     name = serializers.CharField(
-        required=True,
-        max_length=255,
-        allow_blank=False,
-        error_messages={
-            'blank': 'School must have a name',
-            'required': 'School must have a name',
-            'max_length': 'School name cannot exceed 255 characters'
-        })
+        max_length=255, allow_blank=True)
     school = serializers.SerializerMethodField(read_only=True)
-    about = serializers.CharField(
-        required=True,
-        allow_blank=False,
-        error_messages={
-            'blank': 'Include something about the school',
-            'required': 'Include something about the school'
-        })
-    history = serializers.CharField(
-        allow_blank=False,
-        error_messages={
-            'blank': 'Include the school\'s history',
-            'required': 'Include the school\'s history'
-        })
-    fee_structure = serializers.FileField()
-    events = serializers.FileField()
-    updates = serializers.FileField()
-    uniforms = serializers.URLField()
-    location = serializers.CharField()
-    results = serializers.FileField()
+    about = serializers.CharField(required=False, allow_blank=True)
+    history = serializers.CharField(required=False, allow_blank=True)
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
 
@@ -49,12 +25,6 @@ class SchoolSerializer(serializers.ModelSerializer):
             'school',
             'about',
             'history',
-            'fee_structure',
-            'events',
-            'updates',
-            'uniforms',
-            'location',
-            'results',
             'created_at',
             'updated_at'
         ]
@@ -82,7 +52,14 @@ class SchoolSerializer(serializers.ModelSerializer):
     def validate_schoolname(self, data):
         if School.objects.filter(name=data):
             raise serializers.ValidationError(
-                {"name": ["School name already exists"]})
+                {'errors': "School name already exists"})
+        return data
+
+    def validate_user(self, data):
+        if School.objects.filter(school=data):
+            raise serializers.ValidationError({
+                'errors': 'Only one school is allowed per user'
+            })
         return data
 
 
@@ -103,3 +80,37 @@ class CommentSerializer(serializers.ModelSerializer):
         instance.body = data.get('body', instance.body)
         instrance.save()
         return instance
+
+
+class EventSerializer(serializers.ModelSerializer):
+    event_id = serializers.IntegerField(required=False)
+    title = serializers.CharField(max_length=255)
+    date = serializers.DateField(required=False)
+    time = serializers.TimeField()
+    body = serializers.CharField()
+
+    class Meta:
+        model = Event
+        fields = ['event_id', 'title', 'date', 'time', 'body']
+
+
+class UpdateSerializer(serializers.ModelSerializer):
+    update_id = serializers.IntegerField(required=False)
+    title = serializers.CharField(max_length=255)
+    date = serializers.DateField()
+    time = serializers.TimeField()
+    body = serializers.CharField()
+
+    class Meta:
+        model = Update
+        fields = ['update_id', 'title', 'date', 'time', 'body']
+
+
+class UniformSerializer(serializers.ModelSerializer):
+    image = serializers.URLField(required=False, allow_blank=False)
+    title = serializers.CharField()
+    description = serializers.CharField()
+
+    class Meta:
+        model = Uniform
+        fields = ['image', 'title', 'description']

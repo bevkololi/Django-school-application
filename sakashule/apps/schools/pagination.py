@@ -3,11 +3,11 @@ from rest_framework.response import Response
 
 
 class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 10
+    page_size = 12
 
     page_size_query_param = 'page_size'
 
-    max_page_size = 10
+    max_page_size = 12
 
     def paginate_queryset(self, queryset, request, view=None):
         self.django_paginator_class._check_object_list_is_ordered = lambda s: None
