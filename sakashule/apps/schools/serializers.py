@@ -107,10 +107,12 @@ class UpdateSerializer(serializers.ModelSerializer):
 
 
 class UniformSerializer(serializers.ModelSerializer):
-    image = serializers.URLField(required=False, allow_blank=False)
+    uniform_id = serializers.IntegerField(required=False)
+    image = serializers.ImageField()
     title = serializers.CharField()
-    description = serializers.CharField()
+    description = serializers.CharField(default='description')
 
     class Meta:
         model = Uniform
-        fields = ['image', 'title', 'description']
+        fields = ['uniform_id', 'image', 'title', 'description']
+

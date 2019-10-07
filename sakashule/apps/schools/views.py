@@ -45,7 +45,13 @@ class SchoolAPIView(mixins.CreateModelMixin, mixins.UpdateModelMixin,
         serializer.validate_user(request.user)
         serializer.is_valid(raise_exception=True)
         serializer.save(school=request.user)
-        print(request.user)
+
+        profile = Profile.objects.filter(user=request.user).first()
+        prof_data = {'slug': serializer.data['slug']}
+        prof_serializer = ProfileSerializer(profile, data=prof_data, partial=True)
+        prof_serializer.is_valid(raise_exception=True)
+        prof_serializer.save()
+
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -65,6 +71,14 @@ class SchoolAPIView(mixins.CreateModelMixin, mixins.UpdateModelMixin,
             school, data=request.data.get('school', {}), partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save(school=request.user)
+
+        profile = Profile.objects.filter(user=request.user).first()
+        prof_data = {'slug': serializer.data['slug']}
+        prof_serializer = ProfileSerializer(profile, data=prof_data, partial=True)
+        prof_serializer.is_valid(raise_exception=True)
+        prof_serializer.save()
+
+
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
@@ -319,7 +333,7 @@ class UniformAPIView(CreateAPIView, RetrieveUpdateDestroyAPIView):
             data = {"errors": "This school does not exist!"}
             return Response(data, status=status.HTTP_404_NOT_FOUND)
         serializer = self.serializer_class(
-            data=request.data.get('uniform', {}))
+            data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(school=school)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -333,7 +347,7 @@ class UniformAPIView(CreateAPIView, RetrieveUpdateDestroyAPIView):
             data = {"errors": "This school does not exist!"}
             return Response(data, status=status.HTTP_404_NOT_FOUND)
         uniforms = Uniform.objects.filter(school__slug=slug)
-        page = self.paginate_queryset(events)
+        page = self.paginate_queryset(uniforms)
         serializer = self.serializer_class(
             page,
             context={
@@ -373,7 +387,7 @@ class UniformUpdateDestroy(RetrieveUpdateDestroyAPIView):
 
         uniform = Uniform.objects.filter(pk=pk).first()
         serializer = self.serializer_class(
-            update, data=request.data.get('uniform', {}), partial=True)
+            uniform, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save(school=school)
         return Response(serializer.data)

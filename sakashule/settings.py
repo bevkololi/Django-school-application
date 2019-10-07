@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'rest_framework_swagger',
     'sakashule.apps.authentication',
@@ -45,12 +46,12 @@ INSTALLED_APPS = [
     'geoposition',
     'cloudinary',
     'django_filters',
-    'corsheaders',
 ]
 
 GEOPOSITION_GOOGLE_MAPS_API_KEY = 'AIzaSyBTaWhfQU8LDnqNXv6SNcvt2n4AAg0UoNc'
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -162,7 +163,6 @@ CORS_ORIGIN_WHITELIST = [
     '0.0.0.0:4000',  # this came with Django
     'localhost:4000',  # this came with Django
     os.getenv('CLIENT_DOMAIN'),  # the client app
-    'localhost:3000',
 ]
 
 # Add local ports that may require CORS when working locally

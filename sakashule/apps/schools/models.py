@@ -70,8 +70,12 @@ class Update(TimestampsMixin):
 
 
 class Uniform(TimestampsMixin):
+    uniform_id = models.AutoField(primary_key=True)
     school = models.ForeignKey(
         School, on_delete=models.CASCADE, related_name="uniforms")
-    image = models.URLField(default='')
+    image = CloudinaryField("image")
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ['uniform_id']

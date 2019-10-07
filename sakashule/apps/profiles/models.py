@@ -12,6 +12,7 @@ class Profile(TimestampsMixin):
     ownership = models.TextField(default="Kindly update if Private or Public")
     bio = models.TextField(default="Update your bio")
     image = CloudinaryField("image")
+    slug = models.TextField(default='')
 
 
     @property
